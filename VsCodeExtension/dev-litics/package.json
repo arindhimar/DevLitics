@@ -1,0 +1,48 @@
+{
+  "name": "dev-litics",
+  "displayName": "Dev-Litics",
+  "description": "Track time spent coding in different programming languages directly in VS Code.",
+  "version": "0.0.1",
+  "publisher": "your-publisher-name",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/dev-litics"
+  },
+  "engines": {
+    "vscode": "^1.96.0"
+  },
+  "categories": [
+    "Programming Languages",
+    "Productivity"
+  ],
+  "activationEvents": [
+    "onCommand:dev-litics.showTimeSummary",
+    "onCommand:dev-litics.resetTimer"
+  ],
+  "main": "./extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "dev-litics.showTimeSummary",
+        "title": "Show Time Summary"
+      },
+      {
+        "command": "dev-litics.resetTimer",
+        "title": "Reset Timer"
+      }
+    ]
+  },
+  "scripts": {
+    "lint": "eslint .",
+    "pretest": "npm run lint",
+    "test": "vscode-test"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.96.0",
+    "@types/mocha": "^10.0.10",
+    "@types/node": "20.x",
+    "eslint": "^9.16.0",
+    "@vscode/test-cli": "^0.0.10",
+    "@vscode/test-electron": "^2.4.1"
+  }
+}
