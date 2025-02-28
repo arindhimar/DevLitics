@@ -1,7 +1,7 @@
-import React from "react"
 import { motion } from "framer-motion"
-import { Button } from "../components/ui/button"
+import { Button } from "./ui/button"
 import { Check } from "lucide-react"
+import { Link } from "react-router-dom"
 
 const plans = [
   {
@@ -22,7 +22,7 @@ const plans = [
   },
 ]
 
-export default function Pricing() {
+export default function Pricing({ isSignedIn }) {
   return (
     <section id="pricing" className="py-20 sm:py-32 relative overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -72,7 +72,15 @@ export default function Pricing() {
                   ))}
                 </ul>
                 <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                  <Button className="w-full bg-blue-500 hover:bg-blue-600 text-white">Get Started</Button>
+                  {isSignedIn ? (
+                    <Link to="/dashboard">
+                      <Button className="w-full bg-blue-500 hover:bg-blue-600 text-white">Go to Dashboard</Button>
+                    </Link>
+                  ) : (
+                    <Link to="/sign-up">
+                      <Button className="w-full bg-blue-500 hover:bg-blue-600 text-white">Get Started</Button>
+                    </Link>
+                  )}
                 </motion.div>
               </div>
             </motion.div>

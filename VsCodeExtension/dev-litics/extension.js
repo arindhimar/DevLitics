@@ -1,123 +1,120 @@
 const vscode = require("vscode");
 
-class DevLitics {
+class LanguageTracker {
     constructor() {
-        this.languageTracking = new Map(); // Efficient data storage
-        this.currentLanguage = null;
-        this.startTime = null;
-        this.statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
-        this.idleTimer = null;
-        this.IDLE_THRESHOLD = 60 * 1000; // 1-minute idle timeout
+        this.trackingData = new Map();
+        this.activeLanguage = null;
+        this.lastActivityTime = performance.now();
+        this.statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left);
+        this.statusBarItem.show();
+        this.disposables = [];
+        this.isEditorFocused = true;
+        this.startListeners();
     }
 
-    // Start tracking a new language session
-    startTracking(language) {
-        if (this.currentLanguage) this.updateTracking();
+    startListeners() {
+        this.disposables.push(
+            vscode.window.onDidChangeActiveTextEditor(this.handleEditorChange.bind(this)),
+            vscode.workspace.onDidChangeTextDocument(this.registerActivity.bind(this)),
+            vscode.window.onDidChangeTextEditorSelection(this.registerActivity.bind(this)),
+            vscode.window.onDidChangeWindowState(this.handleWindowFocus.bind(this))
+        );
+    }
 
-        this.currentLanguage = language;
-        this.startTime = Date.now();
-        this.resetIdleTimer();
+    handleEditorChange(editor) {
+        if (editor && editor.document) {
+            this.activeLanguage = editor.document.languageId;
+            this.registerActivity();
+        } else {
+            this.activeLanguage = null;
+        }
         this.updateStatusBar();
     }
 
-    // Update elapsed time for the current language
-    updateTracking() {
-        if (!this.currentLanguage || !this.startTime) return;
-
-        const elapsed = (Date.now() - this.startTime) / 1000;
-        this.languageTracking.set(
-            this.currentLanguage,
-            (this.languageTracking.get(this.currentLanguage) || 0) + elapsed
-        );
-
-        this.startTime = Date.now();
+    handleWindowFocus(windowState) {
+        this.isEditorFocused = windowState.focused;
+        if (!this.isEditorFocused) {
+            this.lastActivityTime = null;
+        } else {
+            this.registerActivity();
+        }
     }
 
-    // Reset idle timeout to prevent false inactivity detection
-    resetIdleTimer() {
-        if (this.idleTimer) clearTimeout(this.idleTimer);
-
-        this.idleTimer = setTimeout(() => {
-            this.updateTracking();
-            this.startTime = null;
-            this.currentLanguage = null;
-            this.updateStatusBar();
-        }, this.IDLE_THRESHOLD);
+    registerActivity() {
+        if (!this.isEditorFocused || !this.activeLanguage) return;
+        const currentTime = performance.now();
+        if (this.lastActivityTime) {
+            const elapsedTime = (currentTime - this.lastActivityTime) / 1000; // Convert ms to sec
+            this.trackingData.set(
+                this.activeLanguage,
+                (this.trackingData.get(this.activeLanguage) || 0) + elapsedTime
+            );
+        }
+        this.lastActivityTime = currentTime;
+        this.updateStatusBar();
     }
 
-    // Display tracking info in the status bar
     updateStatusBar() {
-        if (this.currentLanguage) {
-            const timeSpent = this.languageTracking.get(this.currentLanguage) || 0;
-            this.statusBarItem.text = `$(clock) ${this.currentLanguage}: ${timeSpent.toFixed(1)}s`;
-            this.statusBarItem.show();
+        if (this.activeLanguage) {
+            const time = this.trackingData.get(this.activeLanguage) || 0;
+            this.statusBarItem.text = `$(clock) ${this.activeLanguage}: ${this.formatTime(time)}`;
         } else {
-            this.statusBarItem.hide();
+            this.statusBarItem.text = "$(clock) No active language";
         }
     }
 
-    // Generate a summary of all tracked languages
+    formatTime(seconds) {
+        const hours = Math.floor(seconds / 3600);
+        const minutes = Math.floor((seconds % 3600) / 60);
+        const remainingSeconds = Math.floor(seconds % 60);
+        return `${hours}h ${minutes}m ${remainingSeconds}s`;
+    }
+
     getSessionSummary() {
-        let summary = "🕒 **Time Spent Per Language:**\n\n";
-        if (this.languageTracking.size === 0) {
-            summary += "No data recorded in this session.";
-        } else {
-            this.languageTracking.forEach((time, lang) => {
-                summary += `📌 ${lang}: **${time.toFixed(1)} sec**\n`;
-            });
+        if (this.trackingData.size === 0) {
+            return "No activity recorded.";
         }
-        return summary;
+        return Array.from(this.trackingData.entries())
+            .sort(([, a], [, b]) => b - a)
+            .map(([lang, time]) => `${lang}: ${this.formatTime(time)}`)
+            .join("\n");
+    }
+
+    resetTimer() {
+        this.trackingData.clear();
+        this.activeLanguage = null;
+        this.lastActivityTime = performance.now();
+        this.updateStatusBar();
+    }
+
+    dispose() {
+        this.disposables.forEach((d) => d.dispose());
+        this.statusBarItem.dispose();
     }
 }
 
-// Initialize DevLitics tracking instance
-const devLitics = new DevLitics();
+let languageTracker;
 
-// VS Code activation hook
 function activate(context) {
     console.log("✅ Dev-Litics initialized.");
+    languageTracker = new LanguageTracker();
 
-    vscode.workspace.onDidOpenTextDocument((doc) => {
-        devLitics.startTracking(doc.languageId);
-    });
-
-    vscode.window.onDidChangeActiveTextEditor((editor) => {
-        if (editor) devLitics.startTracking(editor.document.languageId);
-    });
-
-    vscode.workspace.onDidChangeTextDocument(() => devLitics.resetIdleTimer());
-    vscode.window.onDidChangeTextEditorSelection(() => devLitics.resetIdleTimer());
-
-    vscode.window.onDidChangeWindowState((state) => {
-        if (!state.focused) {
-            devLitics.updateTracking();
-            devLitics.startTime = null;
-        } else if (devLitics.currentLanguage) {
-            devLitics.startTime = Date.now();
-            devLitics.resetIdleTimer();
-        }
-    });
-
-    // Register commands
-    const showSummaryCommand = vscode.commands.registerCommand("dev-litics.showTimeSummary", () => {
-        vscode.window.showInformationMessage(devLitics.getSessionSummary());
-    });
-
-    const resetCommand = vscode.commands.registerCommand("dev-litics.resetTimer", () => {
-        devLitics.languageTracking.clear();
-        devLitics.currentLanguage = null;
-        devLitics.startTime = null;
-        devLitics.updateStatusBar();
-        vscode.window.showInformationMessage("🔄 Timer reset successfully!");
-    });
-
-    context.subscriptions.push(showSummaryCommand, resetCommand, devLitics.statusBarItem);
+    context.subscriptions.push(
+        vscode.commands.registerCommand("dev-litics.showTimeSummary", () => {
+            vscode.window.showInformationMessage(languageTracker.getSessionSummary());
+        }),
+        vscode.commands.registerCommand("dev-litics.resetTimer", () => {
+            languageTracker.resetTimer();
+            vscode.window.showInformationMessage("🔄 Timer reset successfully!");
+        })
+    );
 }
 
-// VS Code deactivation hook
 function deactivate() {
     console.log("⏹️ Dev-Litics deactivated.");
-    devLitics.updateTracking();
+    if (languageTracker) {
+        languageTracker.dispose();
+    }
 }
 
 module.exports = { activate, deactivate };

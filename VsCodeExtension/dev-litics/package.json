@@ -3,10 +3,10 @@
   "displayName": "Dev-Litics",
   "description": "Track time spent coding in different programming languages directly in VS Code.",
   "version": "0.0.1",
-  "publisher": "your-publisher-name",
+  "publisher": "Arin Dhimar",
   "repository": {
     "type": "git",
-    "url": "https://github.com/your-username/dev-litics"
+    "url": "https://github.com/arindhimar/dev-litics"
   },
   "engines": {
     "vscode": "^1.96.0"

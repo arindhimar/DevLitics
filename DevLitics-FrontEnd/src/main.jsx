@@ -1,14 +1,23 @@
 import React from "react"
 import ReactDOM from "react-dom/client"
-import { ThemeProvider } from "./lib/theme-provider"
-import LandingPage from "./pages/LandingPage"
+import { ClerkProvider } from "@clerk/clerk-react"
+import { BrowserRouter as Router } from "react-router-dom"
+import App from "./App"
 import "./index.css"
+
+const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY
+
+if (!PUBLISHABLE_KEY) {
+  throw new Error("Missing Publishable Key")
+}
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
-    <ThemeProvider>
-      <LandingPage />
-    </ThemeProvider>
+    <ClerkProvider publishableKey={PUBLISHABLE_KEY}>
+      <Router>
+        <App />
+      </Router>
+    </ClerkProvider>
   </React.StrictMode>,
 )
 

@@ -1,10 +1,11 @@
-import React, { useRef, useEffect } from "react"
+import { useRef, useEffect } from "react"
 import { motion, useScroll, useTransform } from "framer-motion"
-import { Button } from "../components/ui/button"
+import { Button } from "./ui/button"
 import { ArrowRight } from "lucide-react"
 import * as THREE from "three"
+import { Link } from "react-router-dom"
 
-export default function Hero() {
+export default function Hero({ isSignedIn }) {
   const containerRef = useRef(null)
   const { scrollYProgress } = useScroll({
     target: containerRef,
@@ -165,9 +166,19 @@ export default function Hero() {
             className="flex flex-col sm:flex-row gap-4"
           >
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-              <Button size="lg" className="w-full sm:w-auto bg-blue-500 hover:bg-blue-600 text-white">
-                Get Started
-              </Button>
+              {isSignedIn ? (
+                <Link to="/dashboard">
+                  <Button size="lg" className="w-full sm:w-auto bg-blue-500 hover:bg-blue-600 text-white">
+                    Go to Dashboard
+                  </Button>
+                </Link>
+              ) : (
+                <Link to="/sign-up">
+                  <Button size="lg" className="w-full sm:w-auto bg-blue-500 hover:bg-blue-600 text-white">
+                    Get Started
+                  </Button>
+                </Link>
+              )}
             </motion.div>
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
               <Button size="lg" variant="outline" className="w-full sm:w-auto group">

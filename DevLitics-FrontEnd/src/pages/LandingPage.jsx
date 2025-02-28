@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from "react"
+import { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { useTheme } from "next-themes"
+import { useTheme } from "../lib/theme-provider"
 import { Moon, Sun, Menu } from "lucide-react"
 import { Button } from "../components/ui/button"
 import Hero from "../components/Hero"
@@ -9,15 +9,13 @@ import Testimonials from "../components/Testimonials"
 import Pricing from "../components/Pricing"
 import Footer from "../components/Footer"
 import ParticleBackground from "../components/ParticleBackground"
+import { Link } from "react-router-dom"
+import { useUser, UserButton } from "@clerk/clerk-react"
 
 export default function LandingPage() {
   const { theme, setTheme } = useTheme()
-  const [mounted, setMounted] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
-
-  useEffect(() => setMounted(true), [])
-
-  if (!mounted) return null
+  const { isSignedIn, user } = useUser()
 
   return (
     <AnimatePresence>
@@ -37,12 +35,12 @@ export default function LandingPage() {
           >
             <div className="flex items-center justify-between h-16">
               <motion.div whileHover={{ scale: 1.05 }} className="flex items-center">
-                <a
-                  href="#"
+                <Link
+                  to="/"
                   className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-teal-400"
                 >
                   DevLitics
-                </a>
+                </Link>
               </motion.div>
               <div className="hidden md:block">
                 <div className="ml-10 flex items-baseline space-x-4">
@@ -58,7 +56,7 @@ export default function LandingPage() {
                   ))}
                 </div>
               </div>
-              <div className="flex items-center">
+              <div className="flex items-center space-x-4">
                 <motion.button
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.95 }}
@@ -67,14 +65,23 @@ export default function LandingPage() {
                 >
                   {theme === "dark" ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
                 </motion.button>
-                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                  <Button className="ml-4 bg-blue-500 hover:bg-blue-600 text-white">Get Started</Button>
-                </motion.div>
+                {isSignedIn ? (
+                  <UserButton afterSignOutUrl="/" />
+                ) : (
+                  <>
+                    <Link to="/sign-in">
+                      <Button variant="ghost">Sign In</Button>
+                    </Link>
+                    <Link to="/sign-up">
+                      <Button>Sign Up</Button>
+                    </Link>
+                  </>
+                )}
                 <motion.button
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.95 }}
                   onClick={() => setMenuOpen(!menuOpen)}
-                  className="ml-4 p-2 rounded-md md:hidden hover:bg-gray-100/50 dark:hover:bg-gray-800/50 transition-colors"
+                  className="p-2 rounded-md md:hidden hover:bg-gray-100/50 dark:hover:bg-gray-800/50 transition-colors"
                 >
                   <Menu className="h-6 w-6" />
                 </motion.button>
@@ -126,10 +133,10 @@ export default function LandingPage() {
         </AnimatePresence>
 
         <main className="relative z-10">
-          <Hero />
+          <Hero isSignedIn={isSignedIn} />
           <Features />
           <Testimonials />
-          <Pricing />
+          <Pricing isSignedIn={isSignedIn} />
         </main>
 
         <Footer />
