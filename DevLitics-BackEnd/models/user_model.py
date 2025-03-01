@@ -20,10 +20,10 @@ class UserModel:
         conn.close()
         return result
 
-    def fetch_by_id(self, userid):
+    def fetch_by_id(self, user_id):
         conn = self.get_db_connection()
         cursor = conn.cursor(dictionary=True)
-        cursor.execute("SELECT * FROM users WHERE userid = %s", (userid,))
+        cursor.execute("SELECT * FROM users WHERE user_id = %s", (user_id,))
         result = cursor.fetchone()
         conn.close()
         return result
@@ -32,26 +32,36 @@ class UserModel:
         conn = self.get_db_connection()
         cursor = conn.cursor(dictionary=True)
         cursor.execute("INSERT INTO users (username, email, password) VALUES (%s, %s, %s)", (username, email, password))
+        user_id = cursor.lastrowid 
+        conn.commit()
+        conn.close()
+        return user_id 
+
+
+    def update_user(self, user_id, username, email, password):
+        conn = self.get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute("UPDATE users SET username = %s, email = %s, password = %s WHERE user_id = %s", 
+                       (username, email, password, user_id))
         conn.commit()
         conn.close()
         return True
 
-    def update_user(self, userid, username, email, password):
+    def delete_user(self, user_id):
         conn = self.get_db_connection()
         cursor = conn.cursor(dictionary=True)
-        cursor.execute("UPDATE users SET username = %s, email = %s, password = %s WHERE userid = %s", 
-                       (username, email, password, userid))
+        cursor.execute("DELETE FROM users WHERE user_id = %s", (user_id,))
         conn.commit()
         conn.close()
         return True
-
-    def delete_user(self, userid):
+    
+    def fetch_by_email(self, email):
         conn = self.get_db_connection()
         cursor = conn.cursor(dictionary=True)
-        cursor.execute("DELETE FROM users WHERE userid = %s", (userid,))
-        conn.commit()
+        cursor.execute("SELECT * FROM users WHERE email = %s", (email,))
+        result = cursor.fetchone()
         conn.close()
-        return True
+        return result
 
     def close_connection(self):
         conn = self.get_db_connection()

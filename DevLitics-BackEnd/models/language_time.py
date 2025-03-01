@@ -11,6 +11,14 @@ class LanguageTimeModel:
             user="root",
             password="root"
         )
+    
+    def fetch_all_language_times(self):
+        conn = self.get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute("SELECT * FROM LANGUAGE_TIME")
+        result = cursor.fetchall()
+        conn.close()
+        return result
 
     def fetch_language_times(self, user_id):
         """Fetch all language records for a user"""
@@ -74,6 +82,25 @@ class LanguageTimeModel:
         conn.commit()
         conn.close()
         return True
+    
+    def delete_by_user_id(self, user_id):
+        """Delete all language records for a user"""
+        conn = self.get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute("DELETE FROM LANGUAGE_TIME WHERE user_id = %s", (user_id,))
+        conn.commit()
+        conn.close()
+        return True
+    
+    def delete_all_language_times(self):
+        """Delete all language records"""
+        conn = self.get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute("DELETE FROM LANGUAGE_TIME")
+        conn.commit()
+        conn.close()
+        return True
+    
 
     def get_total_coding_time(self, user_id):
         """Get the total coding time across all languages for a user"""
