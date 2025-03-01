@@ -58,7 +58,7 @@ export default function ProfilePage() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-900 dark:to-black text-gray-900 dark:text-white">
       <Header />
       <main className="flex-grow">
         <motion.div
@@ -67,33 +67,51 @@ export default function ProfilePage() {
           transition={{ duration: 0.5 }}
           className="container mx-auto p-4 space-y-6"
         >
-          <h1 className="text-3xl font-bold">Profile</h1>
-          <Card>
+          <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-500 to-blue-500">
+            Profile
+          </h1>
+          <Card className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
             <CardHeader>
-              <CardTitle>Personal Information</CardTitle>
-              <CardDescription>Manage your account details and preferences</CardDescription>
+              <CardTitle className="text-gray-900 dark:text-white">Personal Information</CardTitle>
+              <CardDescription className="text-gray-600 dark:text-gray-300">Manage your account details and preferences</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="name">Name</Label>
-                    <Input id="name" value={name} onChange={(e) => setName(e.target.value)} />
+                    <Label htmlFor="name" className="text-gray-700 dark:text-gray-300">Name</Label>
+                    <Input 
+                      id="name" 
+                      value={name} 
+                      onChange={(e) => setName(e.target.value)} 
+                      className="bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                    />
                   </div>
                   <div>
-                    <Label htmlFor="email">Email</Label>
-                    <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+                    <Label htmlFor="email" className="text-gray-700 dark:text-gray-300">Email</Label>
+                    <Input 
+                      id="email" 
+                      type="email" 
+                      value={email} 
+                      onChange={(e) => setEmail(e.target.value)} 
+                      className="bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                    />
                   </div>
                 </div>
                 <div>
-                  <Label htmlFor="bio">Bio</Label>
-                  <Textarea id="bio" value={bio} onChange={(e) => setBio(e.target.value)} />
+                  <Label htmlFor="bio" className="text-gray-700 dark:text-gray-300">Bio</Label>
+                  <Textarea 
+                    id="bio" 
+                    value={bio} 
+                    onChange={(e) => setBio(e.target.value)} 
+                    className="bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  />
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="timezone">Timezone</Label>
+                    <Label htmlFor="timezone" className="text-gray-700 dark:text-gray-300">Timezone</Label>
                     <Select value={timezone} onValueChange={setTimezone}>
-                      <SelectTrigger id="timezone">
+                      <SelectTrigger id="timezone" className="bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
                         <SelectValue placeholder="Select timezone" />
                       </SelectTrigger>
                       <SelectContent>
@@ -104,9 +122,9 @@ export default function ProfilePage() {
                     </Select>
                   </div>
                   <div>
-                    <Label htmlFor="language">Preferred Language</Label>
+                    <Label htmlFor="language" className="text-gray-700 dark:text-gray-300">Preferred Language</Label>
                     <Select value={language} onValueChange={setLanguage}>
-                      <SelectTrigger id="language">
+                      <SelectTrigger id="language" className="bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
                         <SelectValue placeholder="Select language" />
                       </SelectTrigger>
                       <SelectContent>
@@ -121,7 +139,12 @@ export default function ProfilePage() {
             </CardContent>
           </Card>
           <motion.div className="flex justify-end">
-            <Button onClick={handleSaveProfile}>Save Profile</Button>
+            <Button 
+              onClick={handleSaveProfile}
+              className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white"
+            >
+              Save Profile
+            </Button>
           </motion.div>
         </motion.div>
       </main>

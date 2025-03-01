@@ -11,29 +11,30 @@ import { AlertProvider } from '@/components/AlertProvider'
 import LeaderboardPage from './pages/LeaderboardPage'
 
 
+
 export default function App() {
   return (
-    <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
-      <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
-        <AlertProvider>
-          <Router>
-            <Routes>
-              <Route path="/" element={<LandingPage />} />
-              <Route path="/leaderboard" element={<LeaderboardPage />} />
-              <Route element={<ProtectedRoute />}>
-                <Route path="/dashboard" element={<Dashboard />} />
-                <Route path="/profile" element={<ProfilePage />} />
-                <Route path="/change-password" element={<PasswordManagement />} />
-                <Route path="/set-password" element={<PasswordManagement />} />
-              </Route>
-              <Route path="/forgot-password" element={<PasswordManagement />} />
-              <Route path="/reset-password-confirm/:token" element={<PasswordManagement />} />
-              <Route path="/github/callback" element={<GitHubCallback />} />
-            </Routes>
-          </Router>
-        </AlertProvider>
-      </ThemeProvider>
-    </GoogleOAuthProvider>
+    <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+      <AlertProvider>
+        <Router>
+          <Routes>
+            <Route path="/" element={<LandingPage />} />
+            <Route path="/leaderboard" element={<LeaderboardPage />} />
+            
+            <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/profile" element={<ProfilePage />} />
+              <Route path="/change-password" element={<PasswordManagement />} />
+              <Route path="/set-password" element={<PasswordManagement />} />
+            <Route element={<ProtectedRoute />}>
+              
+            </Route>
+            <Route path="/forgot-password" element={<PasswordManagement />} />
+            <Route path="/reset-password-confirm/:token" element={<PasswordManagement />} />
+          </Routes>
+        </Router>
+      </AlertProvider>
+    </ThemeProvider>
+
   )
 }
 

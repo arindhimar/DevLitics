@@ -23,7 +23,6 @@ export function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
   const handleLogout = () => {
-    // TODO: Implement logout functionality
     localStorage.removeItem("token")
     localStorage.removeItem("user")
     navigate("/")
@@ -36,89 +35,75 @@ export function Header() {
   const user = JSON.parse(localStorage.getItem("user") || "{}")
 
   return (
-    <header className="bg-background border-b sticky top-0 z-50">
-      <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between h-16">
-          <div className="flex items-center">
-            <Link to="/" className="text-2xl font-bold text-primary">
-              Dev Litics
-            </Link>
-          </div>
+    <header className="bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-900 dark:to-black border-b sticky top-0 z-50 text-gray-900 dark:text-white shadow-md">
+      <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+        <Link
+          to="/"
+          className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-500 to-blue-500"
+        >
+          Dev Litics
+        </Link>
 
-          <div className="hidden md:flex items-center space-x-6">
-            <Link
-              to="/dashboard"
-              className={`text-sm font-medium ${location.pathname === "/dashboard" ? "text-primary" : "text-muted-foreground hover:text-primary"}`}
-            >
-              Dashboard
-            </Link>
-            <Link
-              to="/analytics"
-              className={`text-sm font-medium ${location.pathname === "/analytics" ? "text-primary" : "text-muted-foreground hover:text-primary"}`}
-            >
-              Analytics
-            </Link>
-            <Link
-              to="/verify-resume"
-              className={`text-sm font-medium ${location.pathname === "/verify-resume" ? "text-primary" : "text-muted-foreground hover:text-primary"}`}
-            >
-              Resume Verification
-            </Link>
-          </div>
+        <div className="flex items-center space-x-6">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={toggleTheme}
+            aria-label="Toggle theme"
+            className="rounded-full hover:bg-gray-200 dark:hover:bg-gray-800"
+          >
+            <Sun className="h-6 w-6 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+            <Moon className="absolute h-6 w-6 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+          </Button>
 
-          <div className="flex items-center space-x-4">
-            <Button variant="ghost" size="icon" onClick={toggleTheme}>
-              {theme === "dark" ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
-            </Button>
-
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="flex items-center space-x-2">
-                  <Avatar className="h-8 w-8">
-                    <AvatarImage src={user.avatar_url} alt={user.username} />
-                    <AvatarFallback>{user.username?.charAt(0).toUpperCase()}</AvatarFallback>
-                  </Avatar>
-                  <span className="hidden md:inline">{user.username}</span>
-                  <ChevronDown className="h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56">
-                <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem
-                  onClick={() => navigate("/dashboard")}
-                  className={location.pathname === "/dashboard" ? "bg-accent" : ""}
-                >
-                  Dashboard
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  onClick={() => navigate("/analytics")}
-                  className={location.pathname === "/analytics" ? "bg-accent" : ""}
-                >
-                  <BarChart className="mr-2 h-4 w-4" />
-                  Analytics
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  onClick={() => navigate("/verify-resume")}
-                  className={location.pathname === "/verify-resume" ? "bg-accent" : ""}
-                >
-                  <FileCheck className="mr-2 h-4 w-4" />
-                  Resume Verification
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  onClick={() => navigate("/profile")}
-                  className={location.pathname === "/profile" ? "bg-accent" : ""}
-                >
-                  Profile
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={handleLogout}>Log out</DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="flex items-center space-x-2">
+                <Avatar className="h-8 w-8">
+                  <AvatarImage src={user.avatar_url} alt={user.username} />
+                  <AvatarFallback>{user.username?.charAt(0).toUpperCase()}</AvatarFallback>
+                </Avatar>
+                <span className="hidden md:inline">{user.username}</span>
+                <ChevronDown className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-56 bg-white dark:bg-gray-800 border dark:border-gray-700">
+              <DropdownMenuLabel>My Account</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                onClick={() => navigate("/dashboard")}
+                className={location.pathname === "/dashboard" ? "bg-purple-500 text-white" : ""}
+              >
+                Dashboard
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                disabled
+                onClick={() => navigate("/analytics")}
+                className={location.pathname === "/analytics" ? "bg-purple-500 text-white" : ""}
+              >
+                <BarChart className="mr-2 h-4 w-4" />
+                Analytics (Coming Soon)
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                disabled
+                onClick={() => navigate("/verify-resume")}
+                className={location.pathname === "/verify-resume" ? "bg-purple-500 text-white" : ""}
+              >
+                <FileCheck className="mr-2 h-4 w-4" />
+                Resume Verification (Coming Soon)
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => navigate("/profile")}
+                className={location.pathname === "/profile" ? "bg-purple-500 text-white" : ""}
+              >
+                Profile
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={handleLogout}>Log out</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
     </header>
   )
 }
-

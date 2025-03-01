@@ -45,7 +45,7 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-900 dark:to-black text-gray-900 dark:text-white">
       <Header />
       <main className="flex-grow">
         <motion.div 
@@ -54,15 +54,17 @@ export default function Dashboard() {
           transition={{ duration: 0.5 }}
           className="container mx-auto p-4 space-y-6"
         >
-          <h1 className="text-3xl font-bold">Dashboard</h1>
+          <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-500 to-blue-500">
+            Dashboard
+          </h1>
 
-          <motion.div
+          {/* <motion.div
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.2 }}
             className="grid grid-cols-1 md:grid-cols-3 gap-6"
           >
-            <Card>
+            <Card className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">Total Commits</CardTitle>
                 <GitCommit className="h-4 w-4 text-muted-foreground" />
@@ -72,7 +74,7 @@ export default function Dashboard() {
                 <p className="text-xs text-muted-foreground">+20.1% from last month</p>
               </CardContent>
             </Card>
-            <Card>
+            <Card className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">Social Shares</CardTitle>
                 <MessageSquare className="h-4 w-4 text-muted-foreground" />
@@ -82,7 +84,7 @@ export default function Dashboard() {
                 <p className="text-xs text-muted-foreground">+15% from last month</p>
               </CardContent>
             </Card>
-            <Card>
+            <Card className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">Engagement Rate</CardTitle>
                 <BarChart className="h-4 w-4 text-muted-foreground" />
@@ -92,7 +94,7 @@ export default function Dashboard() {
                 <p className="text-xs text-muted-foreground">+2.1% from last month</p>
               </CardContent>
             </Card>
-          </motion.div>
+          </motion.div> */}
 
           <motion.div
             initial={{ y: 20, opacity: 0 }}
@@ -100,13 +102,13 @@ export default function Dashboard() {
             transition={{ delay: 0.4 }}
             className="grid grid-cols-1 md:grid-cols-2 gap-6"
           >
-            <Card>
+            <Card className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <GitBranch className="w-6 h-6" />
+                  <GitBranch className="w-6 h-6 text-purple-500" />
                   Git Integration
                 </CardTitle>
-                <CardDescription>Configure your Git repository settings</CardDescription>
+                <CardDescription className="text-gray-600 dark:text-gray-300">Configure your Git repository settings</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
@@ -116,6 +118,7 @@ export default function Dashboard() {
                         placeholder="https://github.com/username/repo.git"
                         value={repo}
                         onChange={(e) => handleRepoChange(index, e.target.value)}
+                        className="bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                       />
                       {index > 0 && (
                         <Button
@@ -131,16 +134,16 @@ export default function Dashboard() {
                   <Button
                     variant="outline"
                     size="sm"
-                    className="mt-2"
+                    className="mt-2 bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white"
                     onClick={handleAddRepo}
                   >
                     <Plus className="h-4 w-4 mr-2" />
                     Add Repository
                   </Button>
                   <div>
-                    <Label htmlFor="track-interval">Commit Tracking Interval</Label>
+                    <Label htmlFor="track-interval" className="text-gray-700 dark:text-gray-300">Commit Tracking Interval</Label>
                     <Select value={trackInterval} onValueChange={setTrackInterval}>
-                      <SelectTrigger id="track-interval">
+                      <SelectTrigger id="track-interval" className="bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
                         <SelectValue placeholder="Select interval" />
                       </SelectTrigger>
                       <SelectContent>
@@ -154,20 +157,20 @@ export default function Dashboard() {
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <Clock className="w-6 h-6" />
+                  <Clock className="w-6 h-6 text-purple-500" />
                   Social Media Integration
                 </CardTitle>
-                <CardDescription>Connect your social media accounts</CardDescription>
+                <CardDescription className="text-gray-600 dark:text-gray-300">Connect your social media accounts</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-2">
-                      <Twitter className="w-5 h-5" />
-                      <Label htmlFor="twitter-integration">Twitter Integration</Label>
+                      <Twitter className="w-5 h-5 text-purple-500" />
+                      <Label htmlFor="twitter-integration" className="text-gray-700 dark:text-gray-300">Twitter Integration</Label>
                     </div>
                     <Switch
                       id="twitter-integration"
@@ -177,8 +180,8 @@ export default function Dashboard() {
                   </div>
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-2">
-                      <Linkedin className="w-5 h-5" />
-                      <Label htmlFor="linkedin-integration">LinkedIn Integration</Label>
+                      <Linkedin className="w-5 h-5 text-purple-500" />
+                      <Label htmlFor="linkedin-integration" className="text-gray-700 dark:text-gray-300">LinkedIn Integration</Label>
                     </div>
                     <Switch
                       id="linkedin-integration"
@@ -197,7 +200,12 @@ export default function Dashboard() {
             transition={{ delay: 0.6 }}
             className="flex justify-end"
           >
-            <Button onClick={handleSaveSettings}>Save Settings</Button>
+            <Button 
+              onClick={handleSaveSettings}
+              className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white"
+            >
+              Save Settings
+            </Button>
           </motion.div>
         </motion.div>
       </main>
@@ -205,4 +213,3 @@ export default function Dashboard() {
     </div>
   )
 }
-

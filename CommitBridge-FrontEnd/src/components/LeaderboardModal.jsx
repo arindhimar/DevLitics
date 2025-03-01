@@ -62,6 +62,7 @@ export default function LeaderboardModal({ isOpen, onClose, leaderboardData = []
   useEffect(() => {
     if (initialSelectedUser) {
       setSelectedUser(initialSelectedUser)
+      console.log(initialSelectedUser)
       setShowList(false)
     } else {
       setShowList(true)
@@ -129,13 +130,13 @@ export default function LeaderboardModal({ isOpen, onClose, leaderboardData = []
             initial={{ scale: 0.9 }}
             animate={{ scale: 1 }}
             exit={{ scale: 0.9 }}
-            className="bg-background rounded-lg shadow-xl p-6 w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col"
+            className="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-6 w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col"
           >
             {showList ? (
               // List View
               <>
                 <div className="flex justify-between items-center mb-6">
-                  <h2 className="text-2xl font-bold flex items-center gap-2">
+                  <h2 className="text-2xl font-bold flex items-center gap-2 bg-clip-text text-transparent bg-gradient-to-r from-purple-500 to-blue-500">
                     <Trophy className="h-6 w-6 text-yellow-500" />
                     Developer Leaderboard
                   </h2>
@@ -195,7 +196,7 @@ export default function LeaderboardModal({ isOpen, onClose, leaderboardData = []
                     {currentUsers.map((user) => (
                       <motion.div
                         key={user.id}
-                        className="bg-card border rounded-lg p-4 cursor-pointer hover:border-primary transition-colors"
+                        className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 cursor-pointer hover:border-primary transition-colors"
                         whileHover={{ scale: 1.01 }}
                         onClick={() => handleUserClick(user)}
                       >
@@ -298,7 +299,7 @@ export default function LeaderboardModal({ isOpen, onClose, leaderboardData = []
                           <AvatarFallback>{selectedUser.name.charAt(0)}</AvatarFallback>
                         </Avatar>
                         <div>
-                          <h2 className="text-2xl font-bold flex items-center gap-2">
+                          <h2 className="text-2xl font-bold flex items-center gap-2 bg-clip-text text-transparent bg-gradient-to-r from-purple-500 to-blue-500">
                             {selectedUser.name}
                             <Badge className="ml-2">
                               {getRankIcon(selectedUser.rank)} Rank #{selectedUser.rank}
@@ -316,17 +317,17 @@ export default function LeaderboardModal({ isOpen, onClose, leaderboardData = []
 
                         <h3 className="text-lg font-medium mb-2">Coding Activity</h3>
                         <div className="grid grid-cols-3 gap-4 mb-6">
-                          <div className="bg-card border rounded-lg p-4 text-center">
+                          <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 text-center">
                             <Clock className="h-5 w-5 mx-auto mb-1 text-purple-500" />
                             <div className="text-2xl font-bold">{selectedUser.totalHours}h</div>
                             <div className="text-xs text-muted-foreground">Total Hours</div>
                           </div>
-                          <div className="bg-card border rounded-lg p-4 text-center">
+                          <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 text-center">
                             <Award className="h-5 w-5 mx-auto mb-1 text-amber-500" />
                             <div className="text-2xl font-bold">{selectedUser.streak}</div>
                             <div className="text-xs text-muted-foreground">Day Streak</div>
                           </div>
-                          <div className="bg-card border rounded-lg p-4 text-center">
+                          <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 text-center">
                             <Code className="h-5 w-5 mx-auto mb-1 text-blue-500" />
                             <div className="text-2xl font-bold">{selectedUser.commits}</div>
                             <div className="text-xs text-muted-foreground">Commits</div>
@@ -413,4 +414,3 @@ export default function LeaderboardModal({ isOpen, onClose, leaderboardData = []
     </AnimatePresence>
   )
 }
-
