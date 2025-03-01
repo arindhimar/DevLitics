@@ -1,0 +1,11 @@
+{
+    "python": "python.svg",
+    "javascript": "javascript.svg",
+    "java": "java.svg",
+    "typescript": "typescript.svg",
+    "csharp": "csharp.svg",
+    "c":"c.svg",
+    "cpp":"cpp.svg",
+    "default": "default.svg"
+
+}
