@@ -3,37 +3,35 @@ import { motion } from 'framer-motion';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 
 export default function ProfilePage() {
-  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
-  const [bio, setBio] = useState('');
-  const [timezone, setTimezone] = useState('');
-  const [language, setLanguage] = useState('en');
+  const [username, setUsername] = useState('');
   const [twitterHandle, setTwitterHandle] = useState('');
   const [linkedinProfile, setLinkedinProfile] = useState('');
-  const [postFrequency, setPostFrequency] = useState('daily');
-  const [postTime, setPostTime] = useState('09:00');
+  const [user, setUser] = useState(null);
 
+  // Fetch user data from the backend
   const fetchProfileData = async () => {
     try {
-      const response = await fetch('http://127.0.0.1:5000'); 
-      if (!response.ok) throw new Error('Failed to fetch profile data');
-      const data = await response.json();
-      setName(data.name || '');
-      setEmail(data.email || '');
-      setBio(data.bio || '');
-      setTimezone(data.timezone || '');
-      setLanguage(data.language || 'en');
-      setTwitterHandle(data.twitterHandle || '');
-      setLinkedinProfile(data.linkedinProfile || '');
-      setPostFrequency(data.postFrequency || 'daily');
-      setPostTime(data.postTime || '09:00');
+      const storedUser = localStorage.getItem('user');
+      if (storedUser) {
+        const parsedUser = JSON.parse(storedUser);
+        setUser(parsedUser);
+
+        const response = await fetch(`http://127.0.0.1:5000/user/${parsedUser}`);
+        if (!response.ok) throw new Error('Failed to fetch profile data');
+        const data = await response.json();
+
+        // Set state with fetched data
+        setEmail(data.email || '');
+        setUsername(data.username || '');
+        setTwitterHandle(data.twitterHandle || '');
+        setLinkedinProfile(data.linkedinProfile || '');
+      }
     } catch (error) {
       console.error('Error fetching profile data:', error);
     }
@@ -43,18 +41,36 @@ export default function ProfilePage() {
     fetchProfileData();
   }, []);
 
-  const handleSaveProfile = () => {
-    console.log('Saving profile:', {
-      name,
-      email,
-      bio,
-      timezone,
-      language,
-      twitterHandle,
-      linkedinProfile,
-      postFrequency,
-      postTime,
-    });
+  // Save updated profile data to the backend
+  const handleSaveProfile = async () => {
+    if (!user) return;
+
+    try {
+      const response = await fetch(`http://127.0.0.1:5000/user/${user}`, {
+        method: 'PUT', 
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email,
+          username,
+          twitterHandle,
+          linkedinProfile,
+        }),
+      });
+      const data = await response.json();
+      console.log(data);
+      if(!data.message=="") {
+        console.log('Profile updated successfully');
+      }
+      else if (data.error=="") {
+        console.log('Profile updated successfully');
+      } else {
+        console.log(data.error);
+      }
+    } catch (error) {
+      console.error('Error updating profile:', error);
+    }
   };
 
   return (
@@ -79,15 +95,6 @@ export default function ProfilePage() {
               <div className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="name" className="text-gray-700 dark:text-gray-300">Name</Label>
-                    <Input 
-                      id="name" 
-                      value={name} 
-                      onChange={(e) => setName(e.target.value)} 
-                      className="bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                    />
-                  </div>
-                  <div>
                     <Label htmlFor="email" className="text-gray-700 dark:text-gray-300">Email</Label>
                     <Input 
                       id="email" 
@@ -97,42 +104,34 @@ export default function ProfilePage() {
                       className="bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                     />
                   </div>
-                </div>
-                <div>
-                  <Label htmlFor="bio" className="text-gray-700 dark:text-gray-300">Bio</Label>
-                  <Textarea 
-                    id="bio" 
-                    value={bio} 
-                    onChange={(e) => setBio(e.target.value)} 
-                    className="bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                  />
+                  <div>
+                    <Label htmlFor="username" className="text-gray-700 dark:text-gray-300">Username</Label>
+                    <Input 
+                      id="username" 
+                      value={username} 
+                      onChange={(e) => setUsername(e.target.value)} 
+                      className="bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                    />
+                  </div>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="timezone" className="text-gray-700 dark:text-gray-300">Timezone</Label>
-                    <Select value={timezone} onValueChange={setTimezone}>
-                      <SelectTrigger id="timezone" className="bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
-                        <SelectValue placeholder="Select timezone" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="utc">UTC</SelectItem>
-                        <SelectItem value="est">Eastern Time</SelectItem>
-                        <SelectItem value="pst">Pacific Time</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <Label htmlFor="twitterHandle" className="text-gray-700 dark:text-gray-300">Twitter Handle</Label>
+                    <Input 
+                      id="twitterHandle" 
+                      value={twitterHandle} 
+                      onChange={(e) => setTwitterHandle(e.target.value)} 
+                      className="bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                    />
                   </div>
                   <div>
-                    <Label htmlFor="language" className="text-gray-700 dark:text-gray-300">Preferred Language</Label>
-                    <Select value={language} onValueChange={setLanguage}>
-                      <SelectTrigger id="language" className="bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
-                        <SelectValue placeholder="Select language" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="en">English</SelectItem>
-                        <SelectItem value="es">Spanish</SelectItem>
-                        <SelectItem value="fr">French</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <Label htmlFor="linkedinProfile" className="text-gray-700 dark:text-gray-300">LinkedIn Profile</Label>
+                    <Input 
+                      id="linkedinProfile" 
+                      value={linkedinProfile} 
+                      onChange={(e) => setLinkedinProfile(e.target.value)} 
+                      className="bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                    />
                   </div>
                 </div>
               </div>

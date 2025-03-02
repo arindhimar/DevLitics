@@ -38,14 +38,27 @@ class UserModel:
         return user_id 
 
 
-    def update_user(self, user_id, username, email, password):
+    def update_user(self, user_id, username, email, twitterHandle, linkedinProfile):
         conn = self.get_db_connection()
         cursor = conn.cursor(dictionary=True)
-        cursor.execute("UPDATE users SET username = %s, email = %s, password = %s WHERE user_id = %s", 
-                       (username, email, password, user_id))
-        conn.commit()
-        conn.close()
-        return True
+
+        try:
+            cursor.execute(
+                """UPDATE users 
+                SET username = %s, email = %s,
+                    twitterHandle = %s, linkedinProfile = %s 
+                WHERE user_id = %s""",
+                (username, email, twitterHandle, linkedinProfile, user_id)
+            )
+            conn.commit()
+            return True
+
+        except mysql.connector.Error as e:
+            print(f"Database Error: {e}")
+            return False
+
+        finally:
+            conn.close()
 
     def delete_user(self, user_id):
         conn = self.get_db_connection()

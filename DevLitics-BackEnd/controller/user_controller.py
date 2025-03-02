@@ -19,11 +19,25 @@ def create_user():
     data = request.get_json()
     result = user_model.create_user(data['username'], data['email'], data['password'])
     return jsonify({"message": "User created successfully"} if result else {"error": "Failed to create user"})
-@app.route("/", methods=["PUT"])
-def update_user():
+
+@app.route("/<int:user_id>", methods=["PUT"])
+def update_user(user_id):
     data = request.get_json()
-    result = user_model.update_user(data['user_id'], data['username'], data['email'], data['password'])
-    return jsonify({"message": "User updated successfully"} if result else {"error": "Failed to update user"})
+    
+    if not all(k in data for k in ("username", "email")):
+        return jsonify({"error": "Missing required fields"})
+    
+    if data['username'] == "" or data['email'] == "":
+        return jsonify({"error": "Empty fields"})
+    
+    #if given then add them or else pass empty string
+    if data['twitterHandle'] == "" or data['linkedinProfile'] == "":
+        data['twitterHandle'] = ""
+        data['linkedinProfile'] = ""
+        
+    
+    result = user_model.update_user(user_id, data['username'], data['email'], data['twitterHandle'], data['linkedinProfile'])
+    return jsonify({"message": "User updated successfully"} if result else {"error": "Failed to update user"}),200
 
 @app.route("/", methods=["DELETE"])
 def delete_user():
@@ -45,7 +59,6 @@ def register():
 
 @app.route("/login", methods=["POST"])
 def login():
-    print("Asdhkjashkjd")
     data = request.get_json()
     
     if not all(k in data for k in ("email", "password")):
