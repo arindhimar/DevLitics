@@ -1,71 +1,49 @@
-# sample README
+# DevLitics - VS Code Extension
 
-This is the README for your extension "sample". After writing up a brief description, we recommend including the following sections.
+## 🚀 Overview
+DevLitics is a VS Code extension that tracks coding time per project based on workspace activity. It provides real-time stats on coding hours, helping developers stay productive and analyze their workflow.
 
-## Features
+## 📥 Installation
+### **From VSIX (Local Installation)**
+1. Clone the repository:
+   ```sh
+   git clone link_to_repo
+   cd dev-litics
+   ```
+2. Install dependencies:
+   ```sh
+   npm install
+   npm run watch
+   ```
+3. Goto visual studio code extension guide : [View](./vsc-extension-quickstart.md).
 
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
+## ⚙️ Setup & Running
+1. Open the **Command Palette** (`Ctrl+Shift+P`)
+2. Run `DevLitics: Enter User Key` and input your tracking key
+3. Run `DevLitics: Start Tracking` to begin tracking coding time (prompts for key if unset)
+4. View coding stats in the **DevLitics Statistics** panel (Activity Bar)
 
-For example if there is an image subfolder under your extension project workspace:
+## 📊 Features
+✅ Tracks active coding time per project
+✅ Displays time spent per file & folder
+✅ Stores data locally with an option to sync
+✅ Works seamlessly with multiple workspaces
+✅ Dedicated **DevLitics Statistics** view
 
-\!\[feature X\]\(images/feature-x.png\)
+## 🛠️ Usage Guide
+- Open a workspace folder to start tracking
+- View time spent per project in the **Activity Bar**
+- Stop tracking anytime using `DevLitics: Stop Tracking`
 
-> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
+## ❓ Troubleshooting
+| Issue                | Cause                         | Solution                             |
+|----------------------|-----------------------------|--------------------------------------|
+| No data recorded    | Tracking not started        | Run `DevLitics: Start Tracking`     |
+| Time not updating   | Extension issue             | Restart VS Code, check console logs |
+| Wrong project name  | No folder opened            | Open a workspace folder             |
 
-## Requirements
+## 📜 License
+This project is licensed under the [MIT License](https://opensource.org/licenses/MIT).
 
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
-
-## Extension Settings
-
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
-
-For example:
-
-This extension contributes the following settings:
-
-* `myExtension.enable`: Enable/disable this extension.
-* `myExtension.thing`: Set to `blah` to do something.
-
-## Known Issues
-
-Calling out known issues can help limit users opening duplicate issues against your extension.
-
-## Release Notes
-
-Users appreciate release notes as you update your extension.
-
-### 1.0.0
-
-Initial release of ...
-
-### 1.0.1
-
-Fixed issue #.
-
-### 1.1.0
-
-Added features X, Y, and Z.
-
----
-
-## Following extension guidelines
-
-Ensure that you've read through the extensions guidelines and follow the best practices for creating your extension.
-
-* [Extension Guidelines](https://code.visualstudio.com/api/references/extension-guidelines)
-
-## Working with Markdown
-
-You can author your README using Visual Studio Code. Here are some useful editor keyboard shortcuts:
-
-* Split the editor (`Cmd+\` on macOS or `Ctrl+\` on Windows and Linux).
-* Toggle preview (`Shift+Cmd+V` on macOS or `Shift+Ctrl+V` on Windows and Linux).
-* Press `Ctrl+Space` (Windows, Linux, macOS) to see a list of Markdown snippets.
-
-## For more information
-
-* [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-* [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
-
-**Enjoy!**
+## 🤝 Contributing
+Pull requests and feature suggestions are welcome! Open an issue to discuss improvements.

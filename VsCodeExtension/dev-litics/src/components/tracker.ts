@@ -1,4 +1,3 @@
-// src/tracker.ts
 import * as vscode from 'vscode';
 import { DevInterfaces } from '../utils/interfaces';
 import { DevConstants } from '../utils/constants';
@@ -10,7 +9,6 @@ export class LanguageTracker {
     private isUserActive: boolean = false;
     private typingTimer?: NodeJS.Timeout; // For debouncing
     private lastHeartbeatTime?: number; // Track last update
-    private static readonly HEARTBEAT_INTERVAL = 5000; // 2 minutes in ms
 
     trackTimeSpent(userKey?: string) {
         if (!this.isUserActive || !userKey) {return;}
@@ -27,18 +25,21 @@ export class LanguageTracker {
             // Set a debounced timer to update time after inactivity
             this.typingTimer = setTimeout(() => {
                 this.updateLanguageUsage();
-            }, LanguageTracker.HEARTBEAT_INTERVAL);
+            }, DevConstants.LANGUAGE_HEARTBEAT_INTERVAL);
         }
     }
 
     private updateLanguageUsage() {
+        
+        console.log(this.activeLanguage);
+
         if (!this.activeLanguage || !this.lastHeartbeatTime) {
             this.lastHeartbeatTime = this.startTime;
             return;
         }
 
         const now = Date.now();
-        if (now - this.lastHeartbeatTime >= LanguageTracker.HEARTBEAT_INTERVAL) {
+        if (now - this.lastHeartbeatTime >=DevConstants.LANGUAGE_HEARTBEAT_INTERVAL) {
             const timeSpent = now - this.lastHeartbeatTime; // Time since last heartbeat
             console.log(`Updating ${this.activeLanguage} with ${timeSpent} ms`);
             this.languageUsage[this.activeLanguage] = 
@@ -56,12 +57,10 @@ export class LanguageTracker {
     }
 
     convertToApiFormat(): DevInterfaces.LanguageEntry[] {
-        const afterConv =  Object.entries(this.languageUsage).map(([language, time]) => ({
+       return Object.entries(this.languageUsage).map(([language, time]) => ({
             language_name: language.toLowerCase(),
-            language_time: (time / DevConstants.TIME_CONVERSION_UNIT).toString() // Convert ms to min
+            language_time: (time / DevConstants.TIME_CONVERSION_UNIT).toString()
         }));
-        console.log(afterConv);
-        return afterConv;
     }
 
     setLanguageUsage(usage: DevInterfaces.LanguageUsage) {

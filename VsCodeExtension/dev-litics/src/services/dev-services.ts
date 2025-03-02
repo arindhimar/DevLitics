@@ -39,7 +39,6 @@ export class DevServices {
 
             await sendLanguageData(userKey, apiData);
             this.lastApiData = apiData; // Update last sent data only on success
-            console.log('Data sent successfully:', apiData);
         } catch (error) {
             console.error('Error sending data:', error);
             if (axios.isAxiosError(error)) {
@@ -57,7 +56,6 @@ export class DevServices {
         try {
             const usage = await fetchLanguageData(userKey);
             this.tracker.setLanguageUsage(usage);
-            console.log('Previous data fetched successfully:', usage);
         } catch (error) {
             console.error('Error fetching previous data:', error);
             if (axios.isAxiosError(error)) {

@@ -7,4 +7,7 @@ export class DevConstants {
         'Content-Type': 'application/json'
     };
     public static readonly TIME_CONVERSION_UNIT = 1;
+    public static readonly PROJECT_HEARTBEAT_INTERVAL = 60 * 1000; // 60 seconds heartbeat interval
+    public static readonly LANGUAGE_HEARTBEAT_INTERVAL = 5000; // 2 minutes in ms
+    
 }

@@ -6,6 +6,10 @@
     "csharp": "csharp.svg",
     "c":"c.svg",
     "cpp":"cpp.svg",
-    "default": "default.svg"
+    "default": "default.svg",
+    "javascriptreact":"react.svg",
+    "php":"php.svg",
+    "html":"html5.svg",
+    "sql":"sql-database.svg"
 
 }
