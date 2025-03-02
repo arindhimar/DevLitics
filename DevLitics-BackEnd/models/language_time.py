@@ -57,7 +57,7 @@ class LanguageTimeModel:
             existing_record = cursor.fetchone()
 
             if existing_record:
-                new_time = float(existing_record["language_time"]) + float(language_time)
+                new_time = float(language_time)
                 cursor.execute(
                     "UPDATE LANGUAGE_TIME SET language_time = %s WHERE user_id = %s AND language_name = %s",
                     (new_time, user_id, language_name)
@@ -94,7 +94,7 @@ class LanguageTimeModel:
         conn = self.get_db_connection()
         cursor = conn.cursor(dictionary=True)
         cursor.execute(
-            "DELETE FROM LANGUAGE_TIME WHERE user_id = %s AND language_name = %s",
+            "DELETE FROM language_time WHERE user_id = %s AND language_name = %s",
             (user_id, language_name)
         )
         conn.commit()
@@ -105,7 +105,7 @@ class LanguageTimeModel:
         """Delete all language records for a user"""
         conn = self.get_db_connection()
         cursor = conn.cursor(dictionary=True)
-        cursor.execute("DELETE FROM LANGUAGE_TIME WHERE user_id = %s", (user_id,))
+        cursor.execute("DELETE FROM language_time WHERE user_id = %s", (user_id,))
         conn.commit()
         conn.close()
         return True
@@ -114,7 +114,7 @@ class LanguageTimeModel:
         """Delete all language records"""
         conn = self.get_db_connection()
         cursor = conn.cursor(dictionary=True)
-        cursor.execute("DELETE FROM LANGUAGE_TIME")
+        cursor.execute("DELETE FROM language_time")
         conn.commit()
         conn.close()
         return True

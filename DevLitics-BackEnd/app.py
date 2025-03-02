@@ -7,6 +7,9 @@ from controller.language_time_controller import app as language_time_app
 from controller.project_time_controller import app as project_time_app
 from controller.github_controller import github_bp as github_app  # Import GitHub Blueprint
 from controller.twitter_controller import twitter_bp as twitter_app  # Import Twitter Blueprint
+# from controller.tweet import tweet_bp as tweet_app 
+from controller.tweet import tweet_blueprint
+
 
 # Initialize Flask app
 app = Flask(__name__)
@@ -18,6 +21,8 @@ app.register_blueprint(language_time_app, url_prefix="/language_time")
 app.register_blueprint(project_time_app, url_prefix="/project_time")
 app.register_blueprint(github_app, url_prefix="/github")  # Register GitHub Blueprint
 app.register_blueprint(twitter_app, url_prefix="/twitter")  # Register Twitter Blueprint
+# app.register_blueprint(tweet_app, url_prefix="/tweet")  # Register Tweet Blueprint
+app.register_blueprint(tweet_blueprint, url_prefix='/api')
 
 # Run the Flask app
 if __name__ == "__main__":

@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Trophy, Search, ArrowUpDown, Clock, Award } from "lucide-react"
+import { Trophy, Search, ArrowUpDown, Clock } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -10,32 +10,35 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import LeaderboardModal from "../components/LeaderboardModal"
 import { useNavigate } from "react-router-dom"
-import { Header } from "@/components/Header"
 
 // Utility function to format time
 const formatTime = (milliseconds) => {
-  const seconds = Math.floor(milliseconds / 1000); // Convert milliseconds to seconds
-  const minutes = Math.floor(seconds / 60); // Convert seconds to minutes
-  const hours = Math.floor(minutes / 60); // Convert minutes to hours
-  const days = Math.floor(hours / 24); // Convert hours to days
+  const seconds = Math.floor(milliseconds / 1000)
+  const minutes = Math.floor(seconds / 60)
+  const hours = Math.floor(minutes / 60)
+  const days = Math.floor(hours / 24)
 
   if (days > 0) {
-    return `${days}d ${hours % 24}h`; // Display in days and hours
+    return `${days}d ${hours % 24}h`
   } else if (hours > 0) {
-    return `${hours}h ${minutes % 60}m`; // Display in hours and minutes
+    return `${hours}h ${minutes % 60}m`
   } else if (minutes > 0) {
-    return `${minutes}m ${seconds % 60}s`; // Display in minutes and seconds
+    return `${minutes}m ${seconds % 60}s`
   } else {
-    return `${seconds}s`; // Display in seconds
+    return `${seconds}s`
   }
-};
+}
 
 export default function LeaderboardPage() {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [leaderboardData, setLeaderboardData] = useState([])
+  const [filteredData, setFilteredData] = useState([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState(null)
   const [selectedUser, setSelectedUser] = useState(null)
+  const [searchQuery, setSearchQuery] = useState("")
+  const [selectedLanguage, setSelectedLanguage] = useState("all")
+  const [sortOrder, setSortOrder] = useState("desc")
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -43,15 +46,14 @@ export default function LeaderboardPage() {
       try {
         setIsLoading(true)
         const baseUrl = "http://127.0.0.1:5000"
-        console.log("Base URL:", baseUrl)
-
         const response = await fetch(`${baseUrl}/language_time/`)
         const data = await response.json()
-        console.log("Raw response:", data)
 
-        // Transform the data into the format expected by the component
+        // Transform and sort the data
         const transformedData = transformApiData(data)
+        transformedData.sort((a, b) => b.totalMilliseconds - a.totalMilliseconds) // Sort by total time
         setLeaderboardData(transformedData)
+        setFilteredData(transformedData) // Initialize filtered data
       } catch (err) {
         console.error("Error fetching leaderboard data:", err)
         setError("Failed to load leaderboard data")
@@ -63,56 +65,81 @@ export default function LeaderboardPage() {
     fetchLeaderboardData()
   }, [])
 
-  // Transform the API data into the format expected by the component
+  // Transform the API data
   const transformApiData = (apiData) => {
-    const transformedData = [];
+    const transformedData = []
 
-    // Iterate through each key in the object
     Object.keys(apiData).forEach((key, index) => {
-      const userData = apiData[key];
+      const userData = apiData[key]
 
       if (userData && userData.languages && userData.username) {
-        // Create a user object from the array data
         const languages = userData.languages.map((langObj) => {
-          const langName = Object.keys(langObj)[0];
-          const milliseconds = Number.parseFloat(langObj[langName]); // Get time in milliseconds
+          const langName = Object.keys(langObj)[0]
+          const milliseconds = Number.parseFloat(langObj[langName])
 
-          // Assign colors based on language
-          let color = "bg-gray-500";
-          if (langName === "Python") color = "bg-green-500";
-          if (langName === "javascript") color = "bg-yellow-500";
-          if (langName === "plaintext") color = "bg-blue-300";
+          let color = "bg-gray-500"
+          if (langName === "Python") color = "bg-green-500"
+          if (langName === "javascript") color = "bg-yellow-500"
+          if (langName === "plaintext") color = "bg-blue-300"
 
           return {
             name: langName,
-            milliseconds, // Store time in milliseconds
+            milliseconds,
             color,
-          };
-        });
+          }
+        })
 
-        // Calculate total time in milliseconds
-        const totalMilliseconds = languages.reduce((sum, lang) => sum + lang.milliseconds, 0);
+        const totalMilliseconds = languages.reduce((sum, lang) => sum + lang.milliseconds, 0)
 
         transformedData.push({
           id: Number.parseInt(key),
-          name: userData.username, // You can replace this with a real name if available
-          username: userData.username, // Use the username from the API
+          name: userData.username,
+          username: userData.username,
           avatar: "/placeholder.svg?height=40&width=40",
           rank: index + 1,
-          totalMilliseconds, // Total time in milliseconds
+          totalMilliseconds,
           languages,
-          streak: Math.floor(Math.random() * 30) + 1, // Random streak for demo
-          projects: Math.floor(Math.random() * 10) + 1, // Random projects for demo
-          commits: Math.floor(Math.random() * 300) + 50, // Random commits for demo
+          projects: Math.floor(Math.random() * 10) + 1,
+          commits: Math.floor(Math.random() * 300) + 50,
           bio: "Developer using CodeTrack to monitor coding activity.",
           github: `user${key}`,
           linkedin: `user${key}`,
-        });
+        })
       }
-    });
+    })
 
-    return transformedData;
-  };
+    return transformedData
+  }
+
+  // Handle search and filtering
+  useEffect(() => {
+    let filtered = leaderboardData
+
+    // Filter by search query
+    if (searchQuery) {
+      filtered = filtered.filter((user) =>
+        user.name.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+    }
+
+    // Filter by selected language
+    if (selectedLanguage !== "all") {
+      filtered = filtered.filter((user) =>
+        user.languages.some((lang) => lang.name.toLowerCase() === selectedLanguage.toLowerCase())
+      )
+    }
+
+    // Sort the filtered data
+    filtered.sort((a, b) => {
+      if (sortOrder === "asc") {
+        return a.totalMilliseconds - b.totalMilliseconds
+      } else {
+        return b.totalMilliseconds - a.totalMilliseconds
+      }
+    })
+
+    setFilteredData(filtered)
+  }, [searchQuery, selectedLanguage, sortOrder, leaderboardData])
 
   const handleUserClick = (user) => {
     setSelectedUser(user)
@@ -168,7 +195,12 @@ export default function LeaderboardPage() {
             <div className="flex flex-col md:flex-row gap-4 mb-6 justify-between">
               <div className="relative flex-1 max-w-md">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-                <Input placeholder="Search developers..." className="pl-10" />
+                <Input
+                  placeholder="Search developers..."
+                  className="pl-10"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
               </div>
 
               <div className="flex gap-2">
@@ -184,25 +216,29 @@ export default function LeaderboardPage() {
                   </SelectContent>
                 </Select>
 
-                <Button variant="outline" className="flex items-center gap-1">
+                <Button
+                  variant="outline"
+                  className="flex items-center gap-1"
+                  onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
+                >
                   <ArrowUpDown className="h-4 w-4" />
-                  Sort
+                  {sortOrder === "asc" ? "Ascending" : "Descending"}
                 </Button>
               </div>
             </div>
 
-            <Tabs defaultValue="all" className="mb-6">
+            <Tabs defaultValue="all" onValueChange={(value) => setSelectedLanguage(value)}>
               <TabsList>
                 <TabsTrigger value="all">All Languages</TabsTrigger>
                 <TabsTrigger value="javascript">JavaScript</TabsTrigger>
                 <TabsTrigger value="python">Python</TabsTrigger>
-                <TabsTrigger value="other">Other</TabsTrigger>
+                <TabsTrigger value="plaintext">Other</TabsTrigger>
               </TabsList>
             </Tabs>
 
             <div className="space-y-3">
-              {leaderboardData.length > 0 ? (
-                leaderboardData.slice(0, 5).map((user) => (
+              {filteredData.length > 0 ? (
+                filteredData.slice(0, 5).map((user) => (
                   <div
                     key={user.id}
                     className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 cursor-pointer hover:border-primary transition-colors"
@@ -227,10 +263,6 @@ export default function LeaderboardPage() {
                               <Clock className="h-3 w-3" />
                               {formatTime(user.totalMilliseconds)}
                             </Badge>
-                            <Badge variant="outline" className="flex items-center gap-1">
-                              <Award className="h-3 w-3" />
-                              {user.streak} days
-                            </Badge>
                           </div>
                         </div>
 
@@ -240,7 +272,7 @@ export default function LeaderboardPage() {
                               <div key={index} className="flex items-center gap-1.5">
                                 <div className={`w-2 h-2 rounded-full ${lang.color}`}></div>
                                 <span className="text-xs">
-                                  {lang.name} ({formatTime(lang.milliseconds)}) 
+                                  {lang.name} ({formatTime(lang.milliseconds)})
                                 </span>
                               </div>
                             ))}
@@ -251,11 +283,11 @@ export default function LeaderboardPage() {
                   </div>
                 ))
               ) : (
-                <div className="text-center py-8 text-muted-foreground">No leaderboard data available</div>
+                <div className="text-center py-8 text-muted-foreground">No matching developers found</div>
               )}
             </div>
 
-            {leaderboardData.length > 5 && (
+            {filteredData.length > 5 && (
               <div className="mt-4 text-center">
                 <Button
                   variant="outline"
@@ -272,7 +304,7 @@ export default function LeaderboardPage() {
         <LeaderboardModal
           isOpen={isModalOpen}
           onClose={handleCloseModal}
-          leaderboardData={leaderboardData}
+          leaderboardData={filteredData}
           initialSelectedUser={selectedUser}
         />
       </div>

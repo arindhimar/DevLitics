@@ -11,7 +11,7 @@ import { Header } from '@/components/Header'
 import { Footer } from '@/components/Footer'
 
 export default function Dashboard() {
-  const [gitRepos, setGitRepos] = useState([{ owner: '', repo: '' }]) // Removed 'url' field
+  const [gitRepos, setGitRepos] = useState([{ owner: '', repo: '' }]) 
   const [githubToken, setGitHubToken] = useState('')
   const [trackInterval, setTrackInterval] = useState('daily')
   const [twitterEnabled, setTwitterEnabled] = useState(false)
@@ -163,6 +163,46 @@ export default function Dashboard() {
       }
     } catch (error) {
       console.error('Failed to update Twitter credentials:', error)
+    }
+  }
+
+  // Function to handle posting the summary
+  const handlePostSummary = async () => {
+    if (!user || !githubToken || gitRepos.length === 0 || !twitterEnabled) {
+      alert('Please fill in all required fields and enable Twitter integration.')
+      return
+    }
+
+    try {
+      const response = await fetch('http://127.0.0.1:5000/api/post_summary', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          github_token: githubToken,
+          repo_owner: gitRepos[0].owner, 
+          repo_name: gitRepos[0].repo,
+          twitter_credentials: {
+            bearer_token: twitterBearerToken,
+            api_key: twitterConsumerKey,
+            api_secret: twitterConsumerSecret,
+            access_token: twitterAccessToken,
+            access_token_secret: twitterAccessTokenSecret,
+          },
+        }),
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        alert(data.message || 'Summary posted successfully!')
+      } else {
+        const errorData = await response.json()
+        alert(errorData.error || 'Failed to post summary.')
+      }
+    } catch (error) {
+      console.error('Error posting summary:', error)
+      alert('An error occurred while posting the summary.')
     }
   }
 
@@ -357,6 +397,16 @@ export default function Dashboard() {
               </div>
             </Card>
           </motion.div>
+
+          {/* Post Button */}
+          <div className="flex justify-center">
+            <Button
+              onClick={handlePostSummary}
+              className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white"
+            >
+              Post Summary to Twitter
+            </Button>
+          </div>
         </motion.div>
       </main>
       <Footer />

@@ -110,7 +110,6 @@ def update_language_time(user_id):
 
 @app.route("/users/<int:user_id>", methods=["DELETE"])
 def delete_language_time(user_id):
-    print("asdhkashdh")
     success = language_time_model.delete_by_user_id(user_id, )
     return jsonify({"message": "Language time deleted successfully"}) if success else (jsonify({"error": "Failed to delete language time"}), 500)
 
