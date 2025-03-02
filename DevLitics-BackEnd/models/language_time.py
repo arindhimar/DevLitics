@@ -15,19 +15,36 @@ class LanguageTimeModel:
     def fetch_all_language_times(self):
         conn = self.get_db_connection()
         cursor = conn.cursor(dictionary=True)
-        cursor.execute("SELECT * FROM LANGUAGE_TIME")
+        
+        cursor.execute("""
+            SELECT u.user_id, u.username, lt.language_name, lt.language_time 
+            FROM LANGUAGE_TIME lt
+            JOIN users u ON lt.user_id = u.user_id
+        """)
+        
         result = cursor.fetchall()
         conn.close()
+        
         return result
 
+
     def fetch_language_times(self, user_id):
-        """Fetch all language records for a user"""
         conn = self.get_db_connection()
         cursor = conn.cursor(dictionary=True)
-        cursor.execute("SELECT * FROM LANGUAGE_TIME WHERE user_id = %s", (user_id,))
+        
+        cursor.execute("""
+            SELECT u.username, lt.language_name, lt.language_time 
+            FROM LANGUAGE_TIME lt
+            JOIN users u ON lt.user_id = u.user_id
+            WHERE lt.user_id = %s
+        """, (user_id,))
+        
         result = cursor.fetchall()
         conn.close()
+        
         return result
+
+    
     def add_language_time(self, user_id, language_name, language_time):
         conn = self.get_db_connection()
         cursor = conn.cursor(dictionary=True)
@@ -40,9 +57,9 @@ class LanguageTimeModel:
             existing_record = cursor.fetchone()
 
             if existing_record:
-                new_time = int(existing_record["language_time"]) + int(language_time)
+                new_time = float(language_time)
                 cursor.execute(
-                    "UPDATE LANGUAGE_TIME SET language_time= %s WHERE user_id = %s AND language_name = %s",
+                    "UPDATE LANGUAGE_TIME SET language_time = %s WHERE user_id = %s AND language_name = %s",
                     (new_time, user_id, language_name)
                 )
             else:
@@ -58,6 +75,7 @@ class LanguageTimeModel:
             return False
         finally:
             conn.close()
+
 
     def update_language_time(self, user_id, language_name, language_time):
         """Update the time spent on a specific language for a user"""
@@ -76,7 +94,7 @@ class LanguageTimeModel:
         conn = self.get_db_connection()
         cursor = conn.cursor(dictionary=True)
         cursor.execute(
-            "DELETE FROM LANGUAGE_TIME WHERE user_id = %s AND language_name = %s",
+            "DELETE FROM language_time WHERE user_id = %s AND language_name = %s",
             (user_id, language_name)
         )
         conn.commit()
@@ -87,7 +105,7 @@ class LanguageTimeModel:
         """Delete all language records for a user"""
         conn = self.get_db_connection()
         cursor = conn.cursor(dictionary=True)
-        cursor.execute("DELETE FROM LANGUAGE_TIME WHERE user_id = %s", (user_id,))
+        cursor.execute("DELETE FROM language_time WHERE user_id = %s", (user_id,))
         conn.commit()
         conn.close()
         return True
@@ -96,7 +114,7 @@ class LanguageTimeModel:
         """Delete all language records"""
         conn = self.get_db_connection()
         cursor = conn.cursor(dictionary=True)
-        cursor.execute("DELETE FROM LANGUAGE_TIME")
+        cursor.execute("DELETE FROM language_time")
         conn.commit()
         conn.close()
         return True

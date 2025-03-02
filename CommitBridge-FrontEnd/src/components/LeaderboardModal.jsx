@@ -23,29 +23,23 @@ import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
-// Fallback mock data in case no data is passed
-const mockUsers = [
-  {
-    id: 1,
-    name: "Sarah Johnson",
-    username: "sarahj",
-    avatar: "/placeholder.svg?height=40&width=40",
-    rank: 1,
-    totalHours: 156,
-    languages: [
-      { name: "JavaScript", hours: 78, color: "bg-yellow-500" },
-      { name: "TypeScript", hours: 45, color: "bg-blue-500" },
-      { name: "Python", hours: 33, color: "bg-green-500" },
-    ],
-    streak: 24,
-    projects: 8,
-    commits: 342,
-    bio: "Full-stack developer specializing in React and Node.js. Currently building AI-powered web applications.",
-    github: "sarahj",
-    linkedin: "sarahjohnson",
-  },
-  // ... other mock users
-]
+// Utility function to format time
+const formatTime = (milliseconds) => {
+  const seconds = Math.floor(milliseconds / 1000)
+  const minutes = Math.floor(seconds / 60)
+  const hours = Math.floor(minutes / 60)
+  const days = Math.floor(hours / 24)
+
+  if (days > 0) {
+    return `${days}d ${hours % 24}h`
+  } else if (hours > 0) {
+    return `${hours}h ${minutes % 60}m`
+  } else if (minutes > 0) {
+    return `${minutes}m ${seconds % 60}s`
+  } else {
+    return `${seconds}s`
+  }
+}
 
 export default function LeaderboardModal({ isOpen, onClose, leaderboardData = [], initialSelectedUser = null }) {
   const [searchQuery, setSearchQuery] = useState("")
@@ -56,13 +50,12 @@ export default function LeaderboardModal({ isOpen, onClose, leaderboardData = []
   const [showList, setShowList] = useState(true)
 
   // Use provided leaderboard data or fallback to mock data if empty
-  const users = leaderboardData.length > 0 ? leaderboardData : mockUsers
+  const users = leaderboardData.length > 0 ? leaderboardData : []
 
   // Set the initial selected user when the modal opens
   useEffect(() => {
     if (initialSelectedUser) {
       setSelectedUser(initialSelectedUser)
-      console.log(initialSelectedUser)
       setShowList(false)
     } else {
       setShowList(true)
@@ -77,13 +70,13 @@ export default function LeaderboardModal({ isOpen, onClose, leaderboardData = []
     (user) =>
       user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       user.username.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      user.languages.some((lang) => lang.name.toLowerCase().includes(searchQuery.toLowerCase())),
+      user.languages.some((lang) => lang.name.toLowerCase().includes(searchQuery.toLowerCase()))
   )
 
   // Sort users based on selected criteria
   const sortedUsers = [...filteredUsers].sort((a, b) => {
-    if (sortBy === "hours") return b.totalHours - a.totalHours
-    if (sortBy === "streak") return b.streak - a.streak
+    if (sortBy === "hours") return b.totalMilliseconds - a.totalMilliseconds
+    if (sortBy === "projects") return b.projects - a.projects
     if (sortBy === "commits") return b.commits - a.commits
     return 0
   })
@@ -174,8 +167,8 @@ export default function LeaderboardModal({ isOpen, onClose, leaderboardData = []
                         <SelectValue placeholder="Sort by" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="hours">Coding Hours</SelectItem>
-                        <SelectItem value="streak">Streak Days</SelectItem>
+                        <SelectItem value="hours">Coding Time</SelectItem>
+                        <SelectItem value="projects">Projects</SelectItem>
                         <SelectItem value="commits">Commits</SelectItem>
                       </SelectContent>
                     </Select>
@@ -187,7 +180,7 @@ export default function LeaderboardModal({ isOpen, onClose, leaderboardData = []
                     <TabsTrigger value="all">All Developers</TabsTrigger>
                     <TabsTrigger value="javascript">JavaScript</TabsTrigger>
                     <TabsTrigger value="python">Python</TabsTrigger>
-                    <TabsTrigger value="java">Java</TabsTrigger>
+                    <TabsTrigger value="plaintext">Other</TabsTrigger>
                   </TabsList>
                 </Tabs>
 
@@ -217,11 +210,7 @@ export default function LeaderboardModal({ isOpen, onClose, leaderboardData = []
                               <div className="flex items-center gap-2 mt-2 sm:mt-0">
                                 <Badge variant="outline" className="flex items-center gap-1">
                                   <Clock className="h-3 w-3" />
-                                  {user.totalHours}h
-                                </Badge>
-                                <Badge variant="outline" className="flex items-center gap-1">
-                                  <Award className="h-3 w-3" />
-                                  {user.streak} days
+                                  {formatTime(user.totalMilliseconds)}
                                 </Badge>
                               </div>
                             </div>
@@ -232,7 +221,7 @@ export default function LeaderboardModal({ isOpen, onClose, leaderboardData = []
                                   <div key={index} className="flex items-center gap-1.5">
                                     <div className={`w-2 h-2 rounded-full ${lang.color}`}></div>
                                     <span className="text-xs">
-                                      {lang.name} ({lang.hours}h)
+                                      {lang.name} ({formatTime(lang.milliseconds)})
                                     </span>
                                   </div>
                                 ))}
@@ -282,10 +271,6 @@ export default function LeaderboardModal({ isOpen, onClose, leaderboardData = []
               selectedUser && (
                 <>
                   <div className="flex justify-between items-center mb-6">
-                    <Button variant="ghost" className="flex items-center gap-1" onClick={handleBackToList}>
-                      <ChevronLeft className="h-4 w-4" />
-                      Back to Leaderboard
-                    </Button>
                     <button onClick={onClose} className="text-muted-foreground hover:text-foreground">
                       <X className="w-6 h-6" />
                     </button>
@@ -319,19 +304,19 @@ export default function LeaderboardModal({ isOpen, onClose, leaderboardData = []
                         <div className="grid grid-cols-3 gap-4 mb-6">
                           <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 text-center">
                             <Clock className="h-5 w-5 mx-auto mb-1 text-purple-500" />
-                            <div className="text-2xl font-bold">{selectedUser.totalHours}h</div>
-                            <div className="text-xs text-muted-foreground">Total Hours</div>
+                            <div className="text-2xl font-bold">{formatTime(selectedUser.totalMilliseconds)}</div>
+                            <div className="text-xs text-muted-foreground">Total Time</div>
                           </div>
-                          <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 text-center">
-                            <Award className="h-5 w-5 mx-auto mb-1 text-amber-500" />
-                            <div className="text-2xl font-bold">{selectedUser.streak}</div>
-                            <div className="text-xs text-muted-foreground">Day Streak</div>
-                          </div>
-                          <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 text-center">
+                          {/* <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 text-center">
                             <Code className="h-5 w-5 mx-auto mb-1 text-blue-500" />
                             <div className="text-2xl font-bold">{selectedUser.commits}</div>
                             <div className="text-xs text-muted-foreground">Commits</div>
                           </div>
+                          <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 text-center">
+                            <Award className="h-5 w-5 mx-auto mb-1 text-amber-500" />
+                            <div className="text-2xl font-bold">{selectedUser.projects}</div>
+                            <div className="text-xs text-muted-foreground">Projects</div>
+                          </div> */}
                         </div>
 
                         <h3 className="text-lg font-medium mb-2">Languages</h3>
@@ -343,12 +328,12 @@ export default function LeaderboardModal({ isOpen, onClose, leaderboardData = []
                                   <div className={`w-3 h-3 rounded-full ${lang.color}`}></div>
                                   <span>{lang.name}</span>
                                 </div>
-                                <span className="text-sm text-muted-foreground">{lang.hours} hours</span>
+                                <span className="text-sm text-muted-foreground">{formatTime(lang.milliseconds)}</span>
                               </div>
                               <div className="h-2 w-full bg-muted rounded-full overflow-hidden">
                                 <div
                                   className={`h-full ${lang.color} rounded-full`}
-                                  style={{ width: `${(lang.hours / selectedUser.totalHours) * 100}%` }}
+                                  style={{ width: `${(lang.milliseconds / selectedUser.totalMilliseconds) * 100}%` }}
                                 />
                               </div>
                             </div>
@@ -364,12 +349,8 @@ export default function LeaderboardModal({ isOpen, onClose, leaderboardData = []
                             <span className="font-medium">{selectedUser.projects}</span>
                           </div>
                           <div className="flex justify-between items-center">
-                            <span className="text-muted-foreground">Avg. Daily Hours</span>
-                            <span className="font-medium">{(selectedUser.totalHours / 30).toFixed(1)}h</span>
-                          </div>
-                          <div className="flex justify-between items-center">
-                            <span className="text-muted-foreground">Commits/Week</span>
-                            <span className="font-medium">{Math.round(selectedUser.commits / 12)}</span>
+                            <span className="text-muted-foreground">Commits</span>
+                            <span className="font-medium">{selectedUser.commits}</span>
                           </div>
                           <div className="flex justify-between items-center">
                             <span className="text-muted-foreground">Most Active</span>

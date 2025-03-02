@@ -33,7 +33,7 @@ language_time_model = LanguageTimeModel()
 @app.route("/", methods=["GET"])
 def fetch_all_language_times():
     result = language_time_model.fetch_all_language_times()
-    
+
     if not result:
         return jsonify({"error": "No language data found"}), 404
 
@@ -41,10 +41,15 @@ def fetch_all_language_times():
 
     for row in result:
         user_id = str(row["user_id"]) 
+        username = row["username"]
+
         if user_id not in combined_data:
-            combined_data[user_id] = []
+            combined_data[user_id] = {
+                "username": username,
+                "languages": []
+            }
         
-        combined_data[user_id].append({row["language_name"]: row["language_time"]})
+        combined_data[user_id]["languages"].append({row["language_name"]: row["language_time"]})
 
     return jsonify(combined_data)
 
@@ -56,11 +61,18 @@ def fetch_language_times(user_id):
     if not result:
         return jsonify([]), 200
 
+    username = result[0]["username"] if result else None
+
     combined_data = {
-        "languages": [{"language_name": row["language_name"], "language_time": row["language_time"]} for row in result]
+        "username": username,
+        "languages": [
+            {"language_name": row["language_name"], "language_time": row["language_time"]}
+            for row in result
+        ]
     }
 
     return jsonify(combined_data)
+
 
 
 @app.route("/users/<int:user_id>", methods=["POST"])
