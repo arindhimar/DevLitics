@@ -10,6 +10,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import LeaderboardModal from "../components/LeaderboardModal"
 import { useNavigate } from "react-router-dom"
+import { Header } from "@/components/Header"
+
 
 // Utility function to format time
 const formatTime = (milliseconds) => {
@@ -159,7 +161,9 @@ export default function LeaderboardPage() {
   }
 
   return (
+    
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-900 dark:to-black text-gray-900 dark:text-white overflow-hidden">
+      <Header/>
       <div className="container mx-auto py-8 px-4">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
           <div>
